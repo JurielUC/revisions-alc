@@ -10,7 +10,7 @@
 
     require "connectDB.php";
 
-    $firstname = $lastname = $gender = $dob = $age = $number = $address = $email = $password = $confirm_password = "";
+    $firstname = $middlename = $lastname = $gender = $dob = $age = $number = $address = $email = $password = $confirm_password = "";
     $firstname_err = $lastname_err = $gender_err = $dob_err = $age_err = $number_err = $address_err = $email_err = $password_err = $confirm_password_err = "";
 
     if (isset($_POST['submit'])) {
@@ -86,8 +86,6 @@
         // Validate Address
         if (empty(trim($_POST["address"]))) {
             $address_err = "Please enter your address.";
-        } elseif (strlen(trim($_POST["address"])) < 5) {
-            $address_err = "Address must be at least 5 characters long.";
         } else {
             $address = trim($_POST["address"]);
         }
@@ -123,16 +121,18 @@
             }
         }
 
+        $middlename = trim($_POST["middlename"]);
 
         if (empty($firstanme_err) && empty($lastname_err) && empty($email_err) && empty($password_err) && empty($confirm_password_err)) {
 
-            $sql = "INSERT INTO users (first_name, last_name, birthday, age, gender, contact_number, address, email, password) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            $sql = "INSERT INTO users (first_name, last_name, middle_name, birthday, age, gender, contact_number, address, email, password) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
             if ($stmt = mysqli_prepare($link, $sql)) {
-                mysqli_stmt_bind_param($stmt, "sssssssss", $param_firstname, $param_lastname, $param_birthday, $param_age, $param_gender, $param_contact_number, $param_address, $param_email, $param_password);
+                mysqli_stmt_bind_param($stmt, "ssssssssss", $param_firstname, $param_lastname, $param_middlename, $param_birthday, $param_age, $param_gender, $param_contact_number, $param_address, $param_email, $param_password);
 
                 $param_firstname = $firstname;
                 $param_lastname = $lastname;
+                $param_middlename = $middlename;
                 $param_birthday = $dob;
                 $param_age = $age;
                 $param_contact_number = $number;
@@ -142,7 +142,7 @@
                 $param_password = password_hash($password, PASSWORD_DEFAULT);
 
                 if (mysqli_stmt_execute($stmt)) {
-                    $firstname = $lastname = $gender = $dob = $age = $number = $address = $email = $password = $confirm_password = "";
+                    $firstname = $middlename = $lastname = $gender = $dob = $age = $number = $address = $email = $password = $confirm_password = "";
                     $firstname_err = $lastname_err = $gender_err = $dob_err = $age_err = $number_err = $address_err = $email_err = $password_err = $confirm_password_err = "";
                     echo "<script>swal({
                         title: 'Success!',
@@ -209,6 +209,32 @@
                                     </div>
                                 </div>
                             </div>
+                            <div class="row">
+                                <div class="col-lg-6">
+                                    <div class="form-group">
+                                        <label for="lastname">Middlename</label>
+                                        <input type="text"
+                                            class="form-control custom-form-border form-control-lg"
+                                            name="middlename"
+                                            id="middlename"
+                                            placeholder="Middlename"
+                                            value="<?php echo htmlspecialchars($middlename); ?>"
+                                            style="text-transform: capitalize;">
+                                    </div>
+                                </div>
+                                <div class="col-lg-6">
+                                <div class="form-group">
+                                    <label for="age">Age</label>
+                                        <input type="number" 
+                                            class="form-control <?php echo (!empty($age_err)) ? 'is-invalid' : 'custom-form-border'; ?> form-control-lg" 
+                                            name="age" 
+                                            id="age"
+                                            placeholder="Age"
+                                            value="<?php echo htmlspecialchars($age); ?>">
+                                        <span class="invalid-feedback"><?php echo $age_err; ?></span>
+                                    </div>
+                                </div>  
+                            </div>
 
                             <div class="form-group">
                                 <label for="dob">Date of Birth</label>
@@ -219,17 +245,6 @@
                                     placeholder="Date of Birth"
                                     value="<?php echo htmlspecialchars($dob); ?>">
                                 <span class="invalid-feedback"><?php echo $dob_err; ?></span>
-                            </div>
-
-                            <div class="form-group">
-                                <label for="age">Age</label>
-                                <input type="number" 
-                                    class="form-control <?php echo (!empty($age_err)) ? 'is-invalid' : 'custom-form-border'; ?> form-control-lg" 
-                                    name="age" 
-                                    id="age"
-                                    placeholder="Age"
-                                    value="<?php echo htmlspecialchars($age); ?>">
-                                <span class="invalid-feedback"><?php echo $age_err; ?></span>
                             </div>
 
                             <div class="form-group">
@@ -258,10 +273,10 @@
 
                             <div class="form-group">
                                 <label for="address">Address</label>
-                                <textarea name="address" 
+                                <input name="address" type="text"
                                         id="address"
                                         class="form-control <?php echo (!empty($address_err)) ? 'is-invalid' : 'custom-form-border'; ?> form-control-lg" 
-                                        placeholder="Address"><?php echo htmlspecialchars($address); ?></textarea>
+                                        placeholder="Address" value="<?php echo htmlspecialchars($address); ?>">
                                 <span class="invalid-feedback"><?php echo $address_err; ?></span>
                             </div>
 

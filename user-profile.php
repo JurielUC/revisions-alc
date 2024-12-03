@@ -11,6 +11,7 @@ if (isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] === true) {
     // Pre-fill the form with existing data
     $firstname = $row['first_name'];
     $lastname = $row['last_name'];
+    $middlename = $row['middle_name'];
     $birthday = $row['birthday']; // Changed from 'dob' to 'birthday'
     $age = $row['age'];
     $gender = $row['gender'];
@@ -67,12 +68,14 @@ if (isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] === true) {
             $address = trim($_POST['address']);
         }
 
+        $middlename = trim($_POST["middlename"]);
+
         // If no errors, update the database
         if (empty($firstname_err) && empty($lastname_err) && empty($birthday_err) && empty($age_err) && empty($gender_err) && empty($number_err) && empty($address_err)) {
-            $sql_update = "UPDATE users SET first_name = ?, last_name = ?, birthday = ?, age = ?, gender = ?, contact_number = ?, address = ? WHERE user_id = ?";
+            $sql_update = "UPDATE users SET first_name = ?, last_name = ?, middle_name = ?, birthday = ?, age = ?, gender = ?, contact_number = ?, address = ? WHERE user_id = ?";
             
             if ($stmt = mysqli_prepare($link, $sql_update)) {
-                mysqli_stmt_bind_param($stmt, "sssssssi", $firstname, $lastname, $birthday, $age, $gender, $number, $address, $_SESSION['id']);
+                mysqli_stmt_bind_param($stmt, "ssssssssi", $firstname, $lastname, $middlename, $birthday, $age, $gender, $number, $address, $_SESSION['id']);
                 
                 if (mysqli_stmt_execute($stmt)) {
                     echo "<script>
@@ -134,6 +137,7 @@ if (isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] === true) {
                         <div class="row">
                             <div class="col">
                                 <div class="form-group">
+                                    <label for="firstname">Firstname</label>
                                     <input type="text"
                                         class="form-control <?php echo (!empty($firstname_err)) ? 'is-invalid' : ''; ?> form-control-lg"
                                         name="firstname"
@@ -145,6 +149,18 @@ if (isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] === true) {
                             </div>
                             <div class="col">
                                 <div class="form-group">
+                                    <label for="middlename">Middlename</label>
+                                    <input type="text"
+                                        class="form-control form-control-lg"
+                                        name="middlename"
+                                        placeholder="Middlename"
+                                        value="<?php echo htmlspecialchars($middlename); ?>"
+                                        style="text-transform: capitalize;">
+                                </div>
+                            </div>
+                            <div class="col">
+                                <div class="form-group">
+                                <label for="lastname">Lastname</label>
                                     <input type="text"
                                         class="form-control <?php echo (!empty($lastname_err)) ? 'is-invalid' : ''; ?> form-control-lg"
                                         name="lastname"
@@ -156,6 +172,7 @@ if (isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] === true) {
                             </div>
                         </div>
                         <div class="form-group">
+                        <label for="dob">Date of birth</label>
                             <input type="date" 
                                 class="form-control <?php echo (!empty($birthday_err)) ? 'is-invalid' : ''; ?> form-control-lg" 
                                 name="dob" 
@@ -164,6 +181,7 @@ if (isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] === true) {
                             <span class="invalid-feedback"><?php echo $birthday_err; ?></span>
                         </div>
                         <div class="form-group">
+                        <label for="age">Age</label>
                             <input type="number" 
                                 class="form-control <?php echo (!empty($age_err)) ? 'is-invalid' : ''; ?> form-control-lg" 
                                 name="age" 
@@ -172,6 +190,7 @@ if (isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] === true) {
                             <span class="invalid-feedback"><?php echo $age_err; ?></span>
                         </div>
                         <div class="form-group">
+                        <label for="gender">Gender</label>
                             <select name="gender" 
                                     class="form-select <?php echo (!empty($gender_err)) ? 'is-invalid' : ''; ?> form-control-lg">
                                 <option value="" disabled <?php echo empty($gender) ? 'selected' : ''; ?>>Gender</option>
@@ -181,6 +200,7 @@ if (isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] === true) {
                             <span class="invalid-feedback"><?php echo $gender_err; ?></span>
                         </div>
                         <div class="form-group">
+                        <label for="number">Phone Number</label>
                             <input type="text" 
                                 class="form-control <?php echo (!empty($number_err)) ? 'is-invalid' : ''; ?> form-control-lg" 
                                 name="number" 
@@ -189,12 +209,15 @@ if (isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] === true) {
                             <span class="invalid-feedback"><?php echo $number_err; ?></span>
                         </div>
                         <div class="form-group">
-                            <textarea name="address" 
-                                    class="form-control <?php echo (!empty($address_err)) ? 'is-invalid' : ''; ?> form-control-lg" 
-                                    placeholder="Address"><?php echo htmlspecialchars($address); ?></textarea>
+                        <label for="address">Address</label>
+                        <input name="address" type="text"
+                                        id="address"
+                                        class="form-control <?php echo (!empty($address_err)) ? 'is-invalid' : ''; ?> form-control-lg" 
+                                        placeholder="Address" value="<?php echo htmlspecialchars($address); ?>">
                             <span class="invalid-feedback"><?php echo $address_err; ?></span>
                         </div>
                         <div class="form-group">
+                        <label for="email">Email</label>
                             <input disabled type="email" class="form-control <?php echo (!empty($email_err)) ? 'is-invalid' : ''; ?> form-control-lg" name="email" placeholder="Email" value="<?php echo $email; ?>">
                             <span class="invalid-feedback"><?php echo $email_err; ?></span>
                         </div>

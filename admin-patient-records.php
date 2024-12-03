@@ -256,7 +256,7 @@ if (isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] === true) {
                                                                         : "PR00" . $row1['patient_record_id'];
                                                                 ?>
                                                             </td>
-                                                            <td><?php echo $row3['first_name']; ?> <?php echo $row3['last_name']; ?></td>
+                                                            <td><?php echo $row3['first_name']; ?> <?php echo $row3['middle_name']; ?> <?php echo $row3['last_name']; ?></td>
                                                             <td><?php if ($row3['contact_number'] == "") {
                                                                     echo 'N/A';
                                                                 } else {

@@ -109,7 +109,7 @@ if (isset($_GET['cancel_appointment_id'])) {
                                                                 : "AP00" . $row1['appointment_id'];
                                                         ?>
                                                     </td>
-                                                    <td><?php echo $row['first_name']; ?> <?php echo $row['last_name']; ?></td>
+                                                    <td><?php echo $row['first_name']; ?> <?php echo $row['middle_name']; ?> <?php echo $row['last_name']; ?></td>
                                                     <td><?php if ($row['contact_number'] == "") {
                                                             echo 'N/A';
                                                         } else {
