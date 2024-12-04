@@ -1,6 +1,8 @@
 <?php
 require_once "connectDB.php";
 
+date_default_timezone_set("Asia/Manila");
+
 if (isset($_POST['date']) && !empty($_POST['date'])) {
     // If a date is selected, fetch available times based on the selected date
     $selected_date = $_POST['date'];
@@ -31,26 +33,40 @@ if (isset($_POST['date']) && !empty($_POST['date'])) {
     // Get available times (those that are not booked or cancelled)
     $available_times = array_diff($valid_times, $booked_times);
 
+    // Get current date and time
+    $current_date = date('Y-m-d');
+    $current_time = date('H:i:s');
+
     // Prepare HTML output
     $options_html = '<div class="mb-4">';
-    $options_html .= '<p class="mb-3 font-weight-bold">Available Time Slots</p>';
+    $options_html .= '<p class="mb-3 font-weight-bold text-dark">Available Time Slots</p>';
     $options_html .= '<hr class="mb-4">';
-    $options_html .= '<div class="row">';
 
-    // Loop through all valid times and disable the ones that are booked
+    // Check if selected date is today
+    $is_today = ($selected_date == $current_date);
+
+    $options_html .= '<div class="row">';
+    // Loop through all valid times and disable the ones that are booked or passed if today
     foreach ($valid_times as $time) {
         $formatted_time = date('h:i A', strtotime($time));
 
+        // Disable times that are booked
         if (in_array($time, $booked_times)) {
-            // If the time is booked, disable the button
             $options_html .= '<div class="col-md-4 mb-3">
                                 <input style="cursor: not-allowed" type="button" class="text-gray form-control time-slot" value="' . $formatted_time . '" disabled readonly />
                               </div>';
         } else {
-            // If the time is available, show it as clickable
-            $options_html .= '<div class="col-md-4 mb-3">
-                                <input type="button" class="form-control time-slot" value="' . $formatted_time . '" readonly />
-                              </div>';
+            // If the selected date is today, disable times earlier than the current time
+            if ($is_today && $time <= $current_time) {
+                $options_html .= '<div class="col-md-4 mb-3">
+                                    <input style="cursor: not-allowed" type="button" class="text-gray form-control time-slot" value="' . $formatted_time . '" disabled readonly />
+                                  </div>';
+            } else {
+                // If the time is available, show it as clickable
+                $options_html .= '<div class="col-md-4 mb-3">
+                                    <input type="button" class="form-control time-slot" value="' . $formatted_time . '" readonly />
+                                  </div>';
+            }
         }
     }
 
@@ -64,7 +80,7 @@ if (isset($_POST['date']) && !empty($_POST['date'])) {
     ];
 
     $options_html = '<div class="mb-4">';
-    $options_html .= '<p class="mb-3 font-weight-bold">Pick a date to view available times.</p>';
+    $options_html .= '<p class="mb-3 font-weight-bold text-dark">Pick a date to view available times.</p>';
     $options_html .= '<hr class="mb-4">';
     $options_html .= '<div class="row">';
 

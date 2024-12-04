@@ -169,6 +169,9 @@ if (isset($_GET['cancel_appointment_id'])) {
                                                                     elseif ($row1['status'] == 2) echo 'Rejected';
                                                                     elseif ($row1['status'] == 3) echo 'Cancelled';
                                                                 ?>
+                                                                <?php 
+                                                                    if ($row1['rejection_reason'] != '') echo "<br /><strong>Rejection Reason: </strong> {$row1['rejection_reason']}";
+                                                                ?>
                                                                 <!-- <br><br>
                                                                 <strong>Confirmation Details:</strong><br>
                                                                 <ul>

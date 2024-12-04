@@ -82,63 +82,99 @@ if (isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] === true) {
                 }
 
                 if (empty($service_err) && empty($subservice_err) && empty($datetime_err)) {
-
                     $sql = "INSERT INTO appointments (user_id, service, subservice, datetime, status, user_active, staff_active) VALUES (?, ?, ?, ?, ?, ?, ?)";
-
+                
                     if ($stmt = mysqli_prepare($link, $sql)) {
                         mysqli_stmt_bind_param($stmt, "isssiii", $param_user_id, $param_service, $param_subservice, $param_datetime, $param_status, $param_user_active, $param_staff_active);
-
+                
+                        // Assigning parameter values
                         $param_user_id = $user_id;
-                        $param_service = $service;
-                        $param_subservice = $subservice;
+                        $param_service = $service; // Ensure $service is properly fetched
+                        $param_subservice = $subservice; // Ensure $subservice is properly fetched
                         $param_datetime = $datetime;
                         $param_status = $status;
                         $param_user_active = $user_active;
                         $param_staff_active = $staff_active;
-
+                
                         if (mysqli_stmt_execute($stmt)) {
+                            // Formatting the date and time
+                            $formattedDate = date("l, j F Y - h:i A", strtotime($datetime));
 
-                            $formattedDate = date("l, F j Y - h:i A", strtotime($datetime));
+                            // Check if subservice is available
+                            $subserviceText = !empty($subservice) ? " under <strong>$subservice</strong>" : "";
 
-                            echo "<script>swal({
+                            // Building the success message with HTML
+                            $successMessage = "
+                                <p style='font-size: 16px;'>
+                                    <strong>Appointment Successful!</strong><br>
+                                    Your appointment for <strong>$service</strong>$subserviceText is scheduled on 
+                                    <strong>$formattedDate</strong>.
+                                </p>
+                                <hr>
+                                <p style='font-size: 14px;'>
+                                    <strong>Note:</strong> Once your appointment is approved, cancellations are not allowed to ensure efficient scheduling for all patients.<br>
+                                    If you have an urgent reason for cancellation, kindly contact us immediately at 
+                                    <strong>(043) 741 6463</strong> or message us through our Facebook page: 
+                                    <a href='https://www.facebook.com/profile.php?id=100072189861231' target='_blank'>Our Facebook Page</a> to discuss your situation.<br>
+                                    Thank you for your understanding and cooperation!
+                                </p>
+                            ";
+
+                            // Displaying the SweetAlert success popup with HTML content
+                            echo "<script>
+                                swal({
                                     title: 'Success!',
-                                    text: 'Appointment Successful! Your Appointment Scheduled on $formattedDate',
+                                    content: (() => {
+                                        const container = document.createElement('div');
+                                        container.innerHTML = `$successMessage`;
+                                        return container;
+                                    })(),
                                     icon: 'success',
                                     closeOnClickOutside: false,
-                                    button: false
-                                });</script>";
-
-            ?>
-                            <meta http-equiv="Refresh" content="1; url=user-appointment">
-            <?php
-
+                                    button: 'OK'
+                                }).then(() => {
+                                    window.location.href = 'user-appointment';
+                                });
+                            </script>";
+                
+                            ?>
+                            <!-- Redirect after 1 second -->
+                            <!-- <meta http-equiv="Refresh" content="3; url=user-appointment"> -->
+                            <?php
                         } else {
-                            echo "<script>swal({
-                                title: 'Oops!',
-                                text: 'Something went wrong. Please try again later.',
-                                icon: 'warning',
-                                button: 'Ok',
-                            });</script>";
+                            // Display error if query fails
+                            echo "<script>
+                                swal({
+                                    title: 'Oops!',
+                                    text: 'Something went wrong. Please try again later.',
+                                    icon: 'warning',
+                                    button: 'OK',
+                                });
+                            </script>";
                         }
-
+                
                         mysqli_stmt_close($stmt);
                     }
                 } elseif (!empty($datetime_err)) {
-                    echo "<script>swal({
-                        title: 'Oops!',
-                        text: '$datetime_err Unable to continue.',
-                        icon: 'warning',
-                        button: 'Ok',
-                    });</script>";
+                    echo "<script>
+                        swal({
+                            title: 'Oops!',
+                            text: '$datetime_err Unable to continue.',
+                            icon: 'warning',
+                            button: 'OK',
+                        });
+                    </script>";
                 } else {
-                    echo "<script>swal({
-                        title: 'Invalid!',
-                        text: 'Oops! looks like some credentials are not yet filled! Unable to continue.',
-                        icon: 'warning',
-                        button: 'Ok',
-                    });</script>";
+                    echo "<script>
+                        swal({
+                            title: 'Invalid!',
+                            text: 'Oops! Looks like some credentials are not yet filled! Unable to continue.',
+                            icon: 'warning',
+                            button: 'OK',
+                        });
+                    </script>";
                 }
-            }
+            }                
 
             ?>
 
@@ -194,13 +230,13 @@ if (isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] === true) {
                                         <input type="button" name="next" class="next btn btn-primary" value="Next" id="nextBtn" disabled />
                                         <div class="form-card">
                                             <div class="card">
-                                                <div class="card-header">Services</div>
+                                                <div class="card-header text-dark">Services</div>
                                                 <div class="card-body">
                                                     <div class="row mb-4">
                                                         <div class="col-md-12">
                                                             <div class="">
-                                                                <label class="form-label" for="service">Please select service</label>
-                                                                <select name="service" id="service" class="form-control select 
+                                                                <label class="form-label text-dark" for="service">Please select service</label>
+                                                                <select name="service" id="service" class="form-control select custom-dark-border text-dark bg-white
                                                                 <?php echo (!empty($service_err)) ? 'is-invalid' : ''; ?> form-control-user" required>
                                                                     <option value="">Please select a service type:</option>
                                                                     <optgroup label="Services:">
@@ -219,8 +255,8 @@ if (isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] === true) {
                                                     <div class="row mb-4" id="subservice-container" style="display: none;">
                                                         <div class="col-md-12">
                                                             <div class="">
-                                                                <label class="form-label" for="subservice">Please select a sub-service</label>
-                                                                <select name="subservice" id="subservice" class="form-control select 
+                                                                <label class="form-label  text-dark" for="subservice">Please select a sub-service</label>
+                                                                <select name="subservice" id="subservice" class="form-control select custom-dark-border bg-white text-dark
                                                                 <?php echo (!empty($subservice_err)) ? 'is-invalid' : ''; ?> form-control-user">
                                                                     <option value="">Select a sub-service</option>
                                                                     <optgroup label="Laboratory Services:">
@@ -280,7 +316,7 @@ if (isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] === true) {
                                         <input type="button" name="next" class="next btn btn-primary" id="nextButton" value="Next" disabled />
                                         <div class="form-card">
                                             <div class="card">
-                                                <div class="card-header">Schedule</div>
+                                                <div class="card-header text-dark">Schedule</div>
                                                 <div class="card-body">
                                                     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.js"></script>
                                                     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.js"></script>
@@ -320,8 +356,23 @@ if (isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] === true) {
                                                                         <div class="card border-0">
                                                                             <div class="card-header card-headerstyle">
                                                                                 <div class="mx-0 mb-0 row justify-content-sm-center justify-content-start px-1">
-                                                                                    <label class="form-label" for="date">Please Select Date</label>
-                                                                                    <input type="date" name="date" id="date" class="form-control form-control-user" required />
+                                                                                    <label class="form-label text-dark" for="date">Please Select Date</label>
+                                                                                    <input type="date" name="date" id="date" class="form-control form-control-user text-dark" required />
+                                                                                    <script>
+                                                                                        document.addEventListener("DOMContentLoaded", function() {
+                                                                                            // Get today's date
+                                                                                            const today = new Date();
+
+                                                                                            // Format the date to YYYY-MM-DD
+                                                                                            const year = today.getFullYear();
+                                                                                            const month = String(today.getMonth() + 1).padStart(2, '0'); // Get month in two digits
+                                                                                            const day = String(today.getDate()).padStart(2, '0'); // Get day in two digits
+
+                                                                                            // Set the min attribute of the date input
+                                                                                            const minDate = `${year}-${month}-${day}`;
+                                                                                            document.getElementById("date").setAttribute("min", minDate);
+                                                                                        });
+                                                                                    </script>
                                                                                     <input type="hidden" name="time" id="time" class="form-control form-control-user" required />
                                                                                 </div>
                                                                             </div>
@@ -452,6 +503,22 @@ if (isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] === true) {
                                                         <p><strong>Sub Service:</strong> <span id="confirmSubService">N/A</span></p>
                                                         <p><strong>Date:</strong> <span id="confirmDate">N/A</span></p>
                                                         <p><strong>Time:</strong> <span id="confirmTime">N/A</span></p>
+                                                    </div>
+                                                    <div style="margin-top: 20px">
+                                                        <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
+                                                            <p>
+                                                                <strong>Important Notice:</strong> Please note that once your appointment is approved, cancellations are not allowed to ensure efficient scheduling for all patients.
+                                                            </p>
+                                                            <p>
+                                                                If you have an urgent reason for cancellation, kindly contact us immediately at 
+                                                                <a href="tel:+63437416463" style="color: #007bff;">(043) 741 6463</a> or reach out through our 
+                                                                <a href="https://www.facebook.com/profile.php?id=100072189861231" target="_blank" style="color: #007bff;">Facebook page</a> 
+                                                                to discuss your situation.
+                                                            </p>
+                                                            <p>
+                                                                Thank you for your understanding and cooperation!
+                                                            </p>
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
