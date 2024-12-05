@@ -113,6 +113,10 @@ if (isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] === true) {
                                         </div>
                                     </div>
                                     <canvas id="myLineChart" style="height: 400px; width: 100%;"></canvas>
+
+                                    <div id="patientFlowAnalysis" class="mt-3">
+                                        <!-- Interpretation of patient flow will be dynamically inserted here -->
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -226,6 +230,38 @@ if (isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] === true) {
 
                     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
                         <script>
+                            function generateAnalysis(data, year, service) {
+                                const totalAppointments = data.counts.reduce((sum, count) => sum + count, 0);
+                                const peakValue = Math.max(...data.counts);
+                                const offPeakValue = Math.min(...data.counts);
+
+                                const peakMonths = data.months.filter((_, index) => data.counts[index] === peakValue);
+                                const offPeakMonths = data.months.filter((_, index) => data.counts[index] === offPeakValue);
+
+                                const peakMonthsStr = peakMonths.join(', ');
+                                const offPeakMonthsStr = offPeakMonths.join(', ');
+
+                                if (totalAppointments > 0) {
+                                    return `
+                                        <h4><strong>Yearly Analysis: ${service || 'All Services'} in ${year}</strong></h4>
+                                        <p>
+                                            An analysis of patient flow over the past year reveals significant insights into clinic traffic dynamics and appointment scheduling efficiency.
+                                            Our peak patient flow periods occurred in <strong>${peakMonthsStr}</strong>, indicating the highest volume of appointments during these months.
+                                            This trend suggests the potential need for additional staff or extended clinic hours to maintain optimal service levels and reduce patient wait times.
+                                        </p>
+                                        <p>
+                                            Conversely, <strong>${offPeakMonthsStr}</strong> showed the lowest patient flow, providing an opportunity to focus on non-urgent consultations, administrative tasks, or proactive outreach to under-served patient segments.
+                                            These insights are crucial for optimizing appointment scheduling, resource allocation, and ensuring the best use of clinic facilities.
+                                        </p>
+                                        <p>
+                                            Total appointments for ${service || 'all services'} in ${year}: <strong>${totalAppointments}</strong>.
+                                        </p>
+                                    `;
+                                } else {
+                                    return '<p>No appointments found.</p>'
+                                }
+                            }
+
                             async function fetchAppointmentCounts() {
                                 try {
                                     const response = await fetch('fetch-appointment-counts.php');
@@ -274,6 +310,8 @@ if (isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] === true) {
                                 const selectedService = document.getElementById('serviceFilter').value;
                                 const data = await fetchAppointmentCountss(selectedYear, selectedService);
 
+                                const analysisElement = document.getElementById('patientFlowAnalysis');
+
                                 if (data && data.months && data.counts) {
                                     const ctx = document.getElementById('myLineChart').getContext('2d');
 
@@ -313,8 +351,11 @@ if (isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] === true) {
                                             }
                                         }
                                     });
+
+                                    // Generate and display the analysis
+                                    analysisElement.innerHTML = generateAnalysis(data, selectedYear, selectedService);
                                 } else {
-                                    console.log('No appointment data available.');
+                                    analysisElement.innerHTML = `<p>No data available for ${selectedService || 'all services'} in ${selectedYear}. Please choose a different filter.</p>`;
                                 }
                             }
 

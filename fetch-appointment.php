@@ -1,8 +1,8 @@
 <?php
 $host = 'localhost';
-$dbname = 'u632594750_alc_db';
-$username = 'u632594750_alc';
-$password = 'Alc_capstone_2024';
+$dbname = 'alc_db';
+$username = 'root';
+$password = '';
 
 try {
     $pdo = new PDO("mysql:host=$host;dbname=$dbname", $username, $password);

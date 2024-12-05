@@ -39,10 +39,8 @@ if (isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] === true) {
                             <div class="card">
                                 <div class="card-body">
                                     <h2 class="card-title"><strong>Today's Most Chosen Services</strong></h2>
-                                    <p class="card-description">
-
-                                    </p>
                                     <canvas id="myPieChart"></canvas>
+                                    <p class="card-description mt-3"></p>
                                 </div>
                             </div>
                         </div>
@@ -73,6 +71,7 @@ if (isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] === true) {
                                             </div>
                                         </div>
                                         <canvas id="myLineChart" width="400" height="200"></canvas>
+                                        <p class="yearly-analysis mt-3"></p>
                                     </div>
 
                                 </div>
@@ -140,6 +139,25 @@ if (isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] === true) {
                     }
                 }
             });
+
+            // Generate Interpretation
+            const descriptionElement = document.querySelector('.card-description');
+
+            if (hasData) {
+                const [serviceA, serviceB] = data.services.slice(0, 2); // Top two services
+                descriptionElement.innerHTML = `
+                    Based on today's data, the most frequently selected services highlight key trends in patient preferences and clinic demands. 
+                    The high demand for <strong>${serviceA || '-'}</strong> indicates that patients are prioritizing this service for their immediate healthcare needs. 
+                    Similarly, <strong>${serviceB || '-'}</strong> emphasizes the clinic's ability to cater to evolving patient requirements. 
+                    <br /><br />By analyzing these trends, we can adjust resource allocation through inventory management, optimize scheduling, and tailor marketing efforts to address the services that patients are currently gravitating towards. 
+                    This data also provides valuable insights into patient behavior, allowing us to anticipate future needs and improve service delivery.
+                `;
+            } else {
+                descriptionElement.innerHTML = `
+                    No transactions have been recorded today. 
+                    Please check back later for updated insights on service trends.
+                `;
+            }
         });
     </script>
 
@@ -232,7 +250,9 @@ if (isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] === true) {
             const selectedYear = document.getElementById('yearFilter').value;
             const data = await fetchAppointmentsData(selectedYear);
 
-            if (data) {
+            const analysisElement = document.querySelector('.yearly-analysis');
+
+            if (data && Object.keys(data).length > 0) {
                 const ctx = document.getElementById('myLineChart').getContext('2d');
 
                 if (myLineChart) {
@@ -242,12 +262,16 @@ if (isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] === true) {
                 const labels = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
                 const datasets = [];
 
-                for (const service in data) {
-                    const serviceCounts = data[service];
+                const sortedServices = Object.keys(data).sort((a, b) => {
+                    const totalA = data[a].reduce((sum, count) => sum + count, 0);
+                    const totalB = data[b].reduce((sum, count) => sum + count, 0);
+                    return totalB - totalA;
+                });
 
+                for (const service of sortedServices) {
                     datasets.push({
                         label: service,
-                        data: serviceCounts,
+                        data: data[service],
                         borderColor: getRandomColor(),
                         fill: false,
                         tension: 0.1
@@ -278,8 +302,54 @@ if (isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] === true) {
                         }
                     }
                 });
+
+                // Generate Analysis Message
+                const topServices = sortedServices.slice(0, 3);
+                const additionalService = sortedServices[3];
+                const analysisMessage = `
+                    Analyzing the yearly data for our most chosen services, we can observe clear patterns in patient preferences and the shifting demands over the past year. 
+                    The top-ranked service, <strong>${topServices[0]}</strong>, has consistently been the most popular, showing its significant importance to patients' ongoing healthcare needs. 
+                    <br /><br />Following closely are <strong>${topServices[1]}</strong> and <strong>${topServices[2]}</strong>, which have experienced steady growth in selection, indicating increasing patient interest.
+                    ${additionalService ? `<br /><br />Additionally, <strong>${additionalService}</strong>, though lower in ranking, has shown notable spikes in demand at specific times of the year.` : ''}
+                    <br /><br />Overall, the yearly ranking allows us to fine-tune our clinic's strategic decisions, optimize resource management, and develop proactive outreach initiatives to align with patients' evolving healthcare needs.
+                `;
+                analysisElement.innerHTML = analysisMessage;
             } else {
-                console.log('No appointment data available.');
+                // Destroy existing chart if it exists
+                if (myLineChart) {
+                    myLineChart.destroy();
+                }
+
+                // Get the chart context
+                const ctx = document.getElementById('myLineChart').getContext('2d');
+
+                // Create an empty chart
+                myLineChart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: [], // No labels
+                        datasets: [] // No datasets
+                    },
+                    options: {
+                        scales: {
+                            y: {
+                                beginAtZero: true
+                            }
+                        },
+                        responsive: true,
+                        plugins: {
+                            legend: {
+                                position: 'top',
+                            },
+                            title: {
+                                display: true,
+                                text: `Appointments Per Service for ${selectedYear}`
+                            }
+                        }
+                    }
+                });
+
+                analysisElement.innerHTML = 'No data available for the selected year. Please choose another year.';
             }
         }
 
