@@ -90,6 +90,8 @@ if (isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] === true) {
                                                     $sql1 .= " WHERE service = '$serviceFilter'";
                                                 }
 
+                                                $sql1 .= " ORDER BY RAND()";
+
                                                 $r = mysqli_query($link, $sql1);
 
                                                 function formatID($id) {
@@ -138,16 +140,7 @@ if (isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] === true) {
                                 </div>
                             </div>
                         </div>
-                        <div class="col-md-6 mt-4">
-                            <div class="card">
-                                <div class="card-body">
-                                    <h2 class="card-title"><strong>Stock and Used Items</strong></h2>
-                                    <p class="card-description"></p>
-                                    <canvas id="myComboBarlinechart"></canvas>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-6 mt-4">
+                        <div class="col-md-12 mt-4">
                             <div class="card">
                                 <div class="card-body">
                                     <div class="d-flex justify-content-between align-items-center">
@@ -214,6 +207,28 @@ if (isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] === true) {
                                 </div>
                             </div>
                         </div>
+                        <div class="col-md-12 mt-4">
+                            <div class="card">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <h2 class="card-title"><strong>Stock and Used Items</strong></h2>
+                                        <div class="row">
+                                            <div class="col-md-4">
+                                                <form method="GET" action="">
+                                                    <div class="form-group">
+                                                        <label for="serviceFilter2" style="text-wrap: nowrap;">Filter by Service</label>
+                                                        <select name="service" id="serviceFilter2" class="form-select" style="width: 220px; font-size: 12px;">
+                                                        </select>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <canvas id="myComboBarlinechart" class="mt-4"></canvas>
+                                    <p id="interpretationGraph"></p>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <?php include "partials/footer.php"; ?>
@@ -262,7 +277,7 @@ if (isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] === true) {
         $(document).ready(function() {
             $('#inventoryTable').DataTable({
                 "paging": true,
-                "ordering": true,
+                "ordering": false,
                 "info": true,
                 "searching": true,
                 "lengthMenu": [10, 25, 50],
@@ -279,45 +294,63 @@ if (isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] === true) {
         });
     </script>
 
-
-
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <script>
-        fetch('fetch-stock-used-items.php')
-            .then(response => response.json())
-            .then(data => {
-                const items = data.items;
-                const quantities = data.quantities;
-                const quantitiesUsed = data.quantities_used;
-                const completedAppointments = data.appointments;
+        document.addEventListener("DOMContentLoaded", function () {
+            const serviceFilter = document.getElementById("serviceFilter2");
+            const ctx = document.getElementById("myComboBarlinechart").getContext("2d");
+            let chartInstance;
 
-                const ctx = document.getElementById('myComboBarlinechart').getContext('2d');
-                new Chart(ctx, {
-                    type: 'bar',
+            fetch("fetch-all-services.php")
+                .then((response) => {
+                    if (!response.ok) throw new Error("Failed to fetch services.");
+                    return response.json();
+                })
+                .then((services) => {
+                    services.forEach((service) => {
+                        const option = document.createElement("option");
+                        option.value = service;
+                        option.textContent = service;
+                        serviceFilter.appendChild(option);
+                    });
+
+                    // Set default to "All" and trigger initial chart update
+                    serviceFilter.value = "All";
+                    updateChart("All");
+                })
+                .catch((error) => console.error("Error fetching services:", error));
+
+             // Function to update the chart
+    function updateChart(service) {
+        fetch(`fetch-stock-used-items.php?service=${service}`)
+            .then((response) => {
+                if (!response.ok) throw new Error(`Failed to fetch chart data: ${response.status}`);
+                return response.json();
+            })
+            .then((data) => {
+                const { items, quantities, quantities_used } = data;
+
+                if (chartInstance) {
+                    chartInstance.destroy();
+                }
+
+                chartInstance = new Chart(ctx, {
+                    type: "bar",
                     data: {
                         labels: items,
-                        datasets: [{
-                                label: 'Quantity Available',
-                                type: 'bar',
-                                backgroundColor: 'rgba(166, 125, 85, 0.7)',
-                                data: quantities
+                        datasets: [
+                            {
+                                label: "Quantity Available",
+                                backgroundColor: "rgba(166, 125, 85, 0.7)",
+                                data: quantities,
                             },
                             {
-                                label: 'Quantity Used',
-                                type: 'bar',
-                                backgroundColor: 'rgba(204, 214, 121, 0.7)',
-                                data: quantitiesUsed
+                                label: "Quantity Used",
+                                backgroundColor: "rgba(204, 214, 121, 0.7)",
+                                data: quantities_used,
                             },
-                            {
-                                label: 'Appointment',
-                                type: 'line',
-                                fill: false,
-                                borderColor: 'rgba(0, 0, 0, 1)',
-                                data: completedAppointments,
-                                yAxisID: 'y2'
-                            }
-                        ]
+                        ],
                     },
                     options: {
                         responsive: true,
@@ -326,32 +359,108 @@ if (isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] === true) {
                                 beginAtZero: true,
                                 title: {
                                     display: true,
-                                    text: 'Quantity Available and Used'
-                                }
-                            },
-                            y2: {
-                                beginAtZero: true,
-                                position: 'right',
-                                title: {
-                                    display: true,
-                                    text: 'Appointment'
+                                    text: "Quantity Available and Used",
                                 },
-                                grid: {
-                                    drawOnChartArea: false
-                                }
                             },
                             x: {
                                 title: {
                                     display: true,
-                                    text: 'Item'
-                                }
-                            }
+                                    text: "Items",
+                                },
+                            },
                         },
-                    }
+                    },
                 });
+
+                // Update the interpretation text based on the selected service
+                if (service === "All") {
+                    interpretationGraph.innerHTML = generateDetailedInterpretationForAll(quantities, quantities_used, items);
+                } else {
+                    interpretationGraph.innerHTML = generateDetailedInterpretationForService(service, items, quantities, quantities_used);
+                }
             })
-            .catch(error => console.error('Error fetching data:', error));
-    </script>
+            .catch((error) => console.error("Error fetching chart data:", error));
+        }
+
+        // Listen for changes in the service dropdown
+        serviceFilter.addEventListener("change", (event) => {
+            const selectedService = event.target.value;
+            if (selectedService) {
+                updateChart(selectedService);
+            } else if (chartInstance) {
+                chartInstance.destroy();
+            }
+        });
+
+        });
+
+        // Generate detailed interpretation for all services
+    // Generate detailed interpretation for all services (HTML format)
+    function generateDetailedInterpretationForAll(quantities, quantities_used, items) {
+        let interpretation = "<p><strong>Overall Analysis:</strong> This chart compares the available and used quantities across all services.</p>";
+
+        let totalAvailable = quantities.reduce((sum, quantity) => sum + quantity, 0);
+        let totalUsed = quantities_used.reduce((sum, used) => sum + used, 0);
+        let overallAvailability = (totalAvailable - totalUsed) / totalAvailable * 100;
+
+        interpretation += `<p><strong>Total Available:</strong> ${totalAvailable} items</p>`;
+        interpretation += `<p><strong>Total Used:</strong> ${totalUsed} items</p>`;
+        interpretation += `<p><strong>Overall Availability Rate:</strong> ${overallAvailability.toFixed(2)}%</p>`;
+
+        interpretation += "<p><strong>Item-level Insights:</strong></p><ul>";
+
+        items.forEach((item, index) => {
+            const available = quantities[index];
+            const used = quantities_used[index];
+            const usageRate = (used / available) * 100;
+
+            if (usageRate > 75) {
+                interpretation += `<li><strong>${item}</strong> has a high usage rate of <strong>${usageRate.toFixed(2)}%</strong>. Consider replenishing stock.</li>`;
+            } else if (usageRate < 25) {
+                interpretation += `<li><strong>${item}</strong> is under-utilized with a usage rate of <strong>${usageRate.toFixed(2)}%</strong>. Consider reducing stock levels.</li>`;
+            } else {
+                interpretation += `<li><strong>${item}</strong> has a balanced usage rate of <strong>${usageRate.toFixed(2)}%</strong>.</li>`;
+            }
+        });
+
+        interpretation += "</ul>";
+
+        return interpretation;
+    }
+
+    // Generate detailed interpretation for a specific service (HTML format)
+    function generateDetailedInterpretationForService(service, items, quantities, quantities_used) {
+        let interpretation = `<p><strong>Analysis for "${service}" Service:</strong> This chart compares the available and used quantities for the selected service.</p>`;
+
+        let totalAvailable = quantities.reduce((sum, quantity) => sum + quantity, 0);
+        let totalUsed = quantities_used.reduce((sum, used) => sum + used, 0);
+        let availabilityRate = (totalAvailable - totalUsed) / totalAvailable * 100;
+
+        interpretation += `<p><strong>Total Available for "${service}":</strong> ${totalAvailable} items</p>`;
+        interpretation += `<p><strong>Total Used for "${service}":</strong> ${totalUsed} items</p>`;
+        interpretation += `<p><strong>Availability Rate for "${service}":</strong> ${availabilityRate.toFixed(2)}%</p>`;
+
+        interpretation += "<p><strong>Item-level Insights:</strong></p><ul>";
+
+        items.forEach((item, index) => {
+            const available = quantities[index];
+            const used = quantities_used[index];
+            const usageRate = (used / available) * 100;
+
+            if (usageRate > 75) {
+                interpretation += `<li><strong>${item}</strong> has a high usage rate of <strong>${usageRate.toFixed(2)}%</strong>. Consider replenishing stock.</li>`;
+            } else if (usageRate < 25) {
+                interpretation += `<li><strong>${item}</strong> is under-utilized with a usage rate of <strong>${usageRate.toFixed(2)}%</strong>. Consider reducing stock levels.</li>`;
+            } else {
+                interpretation += `<li><strong>${item}</strong> has a balanced usage rate of <strong>${usageRate.toFixed(2)}%</strong>.</li>`;
+            }
+        });
+
+        interpretation += "</ul>";
+
+        return interpretation;
+    }
+        </script>
 
     <!-- <script>
         fetch('fetch-stock-used-items.php')
@@ -411,6 +520,8 @@ if (isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] === true) {
             })
             .catch(error => console.error('Error fetching data:', error));
     </script> -->
+
+    
 
 </body>
 

@@ -91,6 +91,8 @@ if (isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] === true) {
                                                     $sql1 .= " WHERE service = '$serviceFilter'";
                                                 }
 
+                                                $sql1 .= " ORDER BY RAND()";
+
                                                 $r = mysqli_query($link, $sql1);
 
                                                 function formatID($id) {
@@ -306,7 +308,7 @@ if (isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] === true) {
         $(document).ready(function() {
             $('#machineTable').DataTable({
                 "paging": true,
-                "ordering": true,
+                "ordering": false,
                 "info": true,
                 "searching": true,
                 "lengthMenu": [10, 25, 50],

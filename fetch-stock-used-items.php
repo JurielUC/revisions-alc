@@ -1,52 +1,41 @@
 <?php
 require_once "connectDB.php";
 
+$serviceFilter = isset($_GET['service']) ? $_GET['service'] : 'All';
+
 $totals = [
     "items" => [],
     "quantities" => [],
     "quantities_used" => [],
-    "appointments" => []
 ];
 
-$services = [];
-
-$sql = "SELECT DISTINCT service FROM inventory";
-$result = mysqli_query($link, $sql);
-
-while ($row = mysqli_fetch_assoc($result)) {
-    $service = $row['service'];
-    $services[] = $service;
-    $totals['items'][] = $service;
-    $totals['quantities'][$service] = 0;
-    $totals['quantities_used'][$service] = 0;
-    $totals['appointments'][$service] = 0;
+if ($serviceFilter AND $serviceFilter !== "All") {
+    // Fetch data for a specific service
+    $sql = "SELECT item, SUM(quantity) AS total_quantity, SUM(quantity_used) AS total_quantity_used 
+            FROM inventory 
+            WHERE service = ?
+            GROUP BY item";
+    $stmt = $link->prepare($sql);
+    $stmt->bind_param("s", $serviceFilter);
+    $stmt->execute();
+    $result = $stmt->get_result();
+} else {
+    // Fetch combined data for all services
+    $sql = "SELECT item, SUM(quantity) AS total_quantity, SUM(quantity_used) AS total_quantity_used 
+            FROM inventory 
+            GROUP BY item";
+    $stmt = $link->prepare($sql);
+    $stmt->execute();
+    $result = $stmt->get_result();
 }
 
-$sql = "SELECT service, SUM(quantity) AS total_quantity, SUM(quantity_used) AS total_quantity_used FROM inventory GROUP BY service";
-$result = mysqli_query($link, $sql);
-
-while ($row = mysqli_fetch_assoc($result)) {
-    $service = $row['service'];
-    if (in_array($service, $services)) {
-        $totals['quantities'][$service] = (int)$row['total_quantity'];
-        $totals['quantities_used'][$service] = (int)$row['total_quantity_used'];
-    }
+// Process the result
+while ($row = $result->fetch_assoc()) {
+    $totals['items'][] = $row['item'];
+    $totals['quantities'][] = (int)$row['total_quantity'];
+    $totals['quantities_used'][] = (int)$row['total_quantity_used'];
 }
-
-$appointment_sql = "SELECT service, COUNT(*) as completed_count FROM appointments WHERE status = 1 GROUP BY service";
-$appointment_result = mysqli_query($link, $appointment_sql);
-
-while ($row = mysqli_fetch_assoc($appointment_result)) {
-    $service = $row['service'];
-    if (in_array($service, $services)) {
-        $totals['appointments'][$service] = (int)$row['completed_count'];
-    }
-}
-
-$totals['quantities'] = array_values($totals['quantities']);
-$totals['quantities_used'] = array_values($totals['quantities_used']);
-$totals['appointments'] = array_values($totals['appointments']);
-
+;
 header('Content-Type: application/json');
 echo json_encode($totals);
 ?>

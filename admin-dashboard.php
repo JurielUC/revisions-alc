@@ -40,7 +40,6 @@ if (isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] === true) {
                                 <div class="card-body">
                                     <h2 class="card-title"><strong>Today's Most Chosen Services</strong></h2>
                                     <canvas id="myPieChart"></canvas>
-                                    <p class="card-description mt-3"></p>
                                 </div>
                             </div>
                         </div>
@@ -48,10 +47,17 @@ if (isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] === true) {
                             <div class="card">
                                 <div class="card-body">
                                     <h2 class="card-title"><strong>Total Patient Appointments</strong></h2>
-                                    <p class="card-description">
+                                    <!-- <p class="card-description">
 
-                                    </p>
+                                    </p> -->
                                     <canvas id="myBarChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-12 mt-4">
+                            <div class="card">
+                                <div class="card-body">
+                                    <p class="card-description mt-3"></p>
                                 </div>
                             </div>
                         </div>
@@ -146,10 +152,11 @@ if (isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] === true) {
             if (hasData) {
                 const [serviceA, serviceB] = data.services.slice(0, 2); // Top two services
                 descriptionElement.innerHTML = `
-                    Based on today's data, the most frequently selected services highlight key trends in patient preferences and clinic demands. 
+                    &#8226; Based on today's data, the most frequently selected services highlight key trends in patient preferences and clinic demands. 
                     The high demand for <strong>${serviceA || '-'}</strong> indicates that patients are prioritizing this service for their immediate healthcare needs. 
                     Similarly, <strong>${serviceB || '-'}</strong> emphasizes the clinic's ability to cater to evolving patient requirements. 
-                    <br /><br />By analyzing these trends, we can adjust resource allocation through inventory management, optimize scheduling, and tailor marketing efforts to address the services that patients are currently gravitating towards. 
+                    <br /><br />
+                    &#8226; By analyzing these trends, we can adjust resource allocation through inventory management, optimize scheduling, and tailor marketing efforts to address the services that patients are currently gravitating towards. 
                     This data also provides valuable insights into patient behavior, allowing us to anticipate future needs and improve service delivery.
                 `;
             } else {
@@ -309,9 +316,18 @@ if (isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] === true) {
                 const analysisMessage = `
                     Analyzing the yearly data for our most chosen services, we can observe clear patterns in patient preferences and the shifting demands over the past year. 
                     The top-ranked service, <strong>${topServices[0]}</strong>, has consistently been the most popular, showing its significant importance to patients' ongoing healthcare needs. 
-                    <br /><br />Following closely are <strong>${topServices[1]}</strong> and <strong>${topServices[2]}</strong>, which have experienced steady growth in selection, indicating increasing patient interest.
-                    ${additionalService ? `<br /><br />Additionally, <strong>${additionalService}</strong>, though lower in ranking, has shown notable spikes in demand at specific times of the year.` : ''}
-                    <br /><br />Overall, the yearly ranking allows us to fine-tune our clinic's strategic decisions, optimize resource management, and develop proactive outreach initiatives to align with patients' evolving healthcare needs.
+                    <br /><br />
+                    Following closely are 
+                    <strong>${topServices[1]} <span style="color: green;">&#9650;</span></strong> and 
+                    <strong>${topServices[2]} <span style="color: green;">&#9650;</span></strong>, 
+                    which have experienced steady growth in selection, indicating increasing patient interest.
+                    ${additionalService ? `
+                        <br /><br />
+                        Additionally, <strong>${additionalService} <span style="color: red;">&#9660;</span></strong>, 
+                        though lower in ranking, has shown notable spikes in demand at specific times of the year.
+                    ` : ''}
+                    <br /><br />
+                    Overall, the yearly ranking allows us to fine-tune our clinic's strategic decisions, optimize resource management, and develop proactive outreach initiatives to align with patients' evolving healthcare needs.
                 `;
                 analysisElement.innerHTML = analysisMessage;
             } else {

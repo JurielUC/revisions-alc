@@ -146,6 +146,9 @@ if (isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] === true) {
                                     <tbody>
                                         <?php
                                         $sql1 = "SELECT * FROM inventory WHERE service='$service' ";
+
+                                        $sql1 .= " ORDER BY RAND()";
+
                                         $r = mysqli_query($link, $sql1);
 
 
@@ -427,7 +430,7 @@ if (isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] === true) {
         $(document).ready(function() {
             $('#inventoryTable').DataTable({
                 "paging": true,
-                "ordering": true,
+                "ordering": false,
                 "info": true,
                 "searching": true,
                 "lengthMenu": [10, 25, 50],
