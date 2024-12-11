@@ -282,7 +282,7 @@ if (isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] === true) {
                                 const currentYear = new Date().getFullYear();
                                 const yearFilter = document.getElementById('yearFilter');
                                 yearFilter.innerHTML = ''; // Clear existing options
-                                for (let year = currentYear; year >= 2000; year--) {
+                                for (let year = currentYear; year >= 2018; year--) {
                                     const option = document.createElement('option');
                                     option.value = year;
                                     option.text = year;

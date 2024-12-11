@@ -176,7 +176,6 @@ if (isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] === true) {
                                             <div class="form-group">
                                                 <label for="statusFilter" style="text-wrap: nowrap;">Filter by Status</label>
                                                 <select name="status" id="statusFilter" class="form-select" style="width: 220px; font-size: 12px;" onchange="this.form.submit()">
-                                                    <option value="">All</option>
                                                     <option value="0" <?php if (isset($_GET['status']) && $_GET['status'] == "0") echo 'selected'; ?>>Pending</option>
                                                     <option value="1" <?php if (isset($_GET['status']) && $_GET['status'] == "1") echo 'selected'; ?>>Approved</option>
                                                     <option value="2" <?php if (isset($_GET['status']) && $_GET['status'] == "2") echo 'selected'; ?>>Rejected</option>
@@ -208,6 +207,8 @@ if (isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] === true) {
                                         
                                         if ($statusFilter !== '') {
                                             $sql1 .= " AND status = '$statusFilter'";
+                                        } else {
+                                            $sql1 .= " AND status = 'Pending'";
                                         }
                                         
                                         $r = mysqli_query($link, $sql1);

@@ -91,7 +91,7 @@ if (isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] === true) {
                                                     $sql1 .= " WHERE service = '$serviceFilter'";
                                                 }
 
-                                                $sql1 .= " ORDER BY RAND()";
+                                                $sql1 .= " ORDER BY machine ASC";
 
                                                 $r = mysqli_query($link, $sql1);
 

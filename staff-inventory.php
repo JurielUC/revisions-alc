@@ -147,7 +147,7 @@ if (isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] === true) {
                                         <?php
                                         $sql1 = "SELECT * FROM inventory WHERE service='$service' ";
 
-                                        $sql1 .= " ORDER BY RAND()";
+                                        $sql1 .= " ORDER BY item ASC";
 
                                         $r = mysqli_query($link, $sql1);
 

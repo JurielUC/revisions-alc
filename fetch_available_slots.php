@@ -13,7 +13,7 @@ if (isset($_POST['date']) && !empty($_POST['date'])) {
     }
 
     // Updated query to exclude cancelled appointments
-    $query = "SELECT datetime FROM appointments WHERE DATE(datetime) = ? AND service = ? AND status != 3";
+    $query = "SELECT datetime FROM appointments WHERE DATE(datetime) = ? AND service = ? AND status NOT IN (2, 3)";
     $stmt = mysqli_prepare($link, $query);
     mysqli_stmt_bind_param($stmt, "ss", $selected_date, $selected_service);
     mysqli_stmt_execute($stmt);

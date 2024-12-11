@@ -150,11 +150,18 @@ if (isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] === true) {
             const descriptionElement = document.querySelector('.card-description');
 
             if (hasData) {
-                const [serviceA, serviceB] = data.services.slice(0, 2); // Top two services
+                const sortedServices = data.services.map((service, index) => ({
+                    service,
+                    count: data.counts[index]
+                })).sort((a, b) => b.count - a.count);
+
+                const analyticsText = sortedServices.map(({ service, count }) => (
+                    `<strong>${service}</strong> with <strong>${count}</strong> appointments`
+                )).join(', ');
+
                 descriptionElement.innerHTML = `
                     &#8226; Based on today's data, the most frequently selected services highlight key trends in patient preferences and clinic demands. 
-                    The high demand for <strong>${serviceA || '-'}</strong> indicates that patients are prioritizing this service for their immediate healthcare needs. 
-                    Similarly, <strong>${serviceB || '-'}</strong> emphasizes the clinic's ability to cater to evolving patient requirements. 
+                    The following services are in high demand: ${analyticsText}. 
                     <br /><br />
                     &#8226; By analyzing these trends, we can adjust resource allocation through inventory management, optimize scheduling, and tailor marketing efforts to address the services that patients are currently gravitating towards. 
                     This data also provides valuable insights into patient behavior, allowing us to anticipate future needs and improve service delivery.
@@ -232,7 +239,7 @@ if (isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] === true) {
             const currentYear = new Date().getFullYear();
             const yearFilter = document.getElementById('yearFilter');
             yearFilter.innerHTML = '';
-            for (let year = currentYear; year >= 2000; year--) {
+            for (let year = currentYear; year >= 2018; year--) {
                 const option = document.createElement('option');
                 option.value = year;
                 option.text = year;
