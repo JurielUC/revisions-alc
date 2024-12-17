@@ -3,15 +3,33 @@ session_start();
 
 require_once "connectDB.php";
 
+// Check if user is logged in
 if (isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] === true) {
+    // Fetch user details from the database
     $sql = "SELECT * FROM users WHERE user_id = '" . $_SESSION['id'] . "'";
     $result = mysqli_query($link, $sql);
-    $row = mysqli_fetch_assoc($result);
 
-    $active = "appointment";
+    if ($result && $row = mysqli_fetch_assoc($result)) {
+        $user_id = $row['user_id'];
+        
+        // Check if the verified field is 0
+        if ($row['verified'] == 0) {
+            // Redirect to the verify-email page
+            header("location: verify-email.php");
+            exit();
+        }
+
+        $active = "appointment";
+    } else {
+        // If user data not found in the database, log the user out
+        session_destroy();
+        header("location: login.php");
+        exit();
+    }
 } else {
-    header("location: login");
-    exit;
+    // Redirect to login page if not logged in
+    header("location: login.php");
+    exit();
 }
 
 ?>
@@ -197,9 +215,7 @@ if (isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] === true) {
                                     </ul>
 
                                     <fieldset>
-                                        <input type="button" name="next" class="next btn btn-primary"
-                                            value="Next" />
-                                        <div class="form-card">
+                                        <div class="form-card mb-0">
                                             <div class="card">
                                                 <div class="card-header">Guide</div>
                                                 <div class="card-body">
@@ -222,12 +238,12 @@ if (isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] === true) {
                                                 </div>
                                             </div>
                                         </div>
+                                        <input type="button" name="next" class="next btn btn-primary text-end"
+                                            value="Next" />
                                     </fieldset>
 
                                     <fieldset>
-                                        <input type="button" name="previous" class="previous btn btn-secondary" value="Previous" />
-                                        <input type="button" name="next" class="next btn btn-primary" value="Next" id="nextBtn" disabled />
-                                        <div class="form-card">
+                                        <div class="form-card mb-0">
                                             <div class="card">
                                                 <div class="card-header text-dark">Services</div>
                                                 <div class="card-body">
@@ -278,6 +294,8 @@ if (isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] === true) {
                                                 </div>
                                             </div>
                                         </div>
+                                        <input type="button" name="previous" class="previous btn btn-secondary" value="Previous" />
+                                        <input type="button" name="next" class="next btn btn-primary" value="Next" id="nextBtn" disabled />
 
                                         <script>
                                             function checkSelection() {
@@ -311,9 +329,7 @@ if (isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] === true) {
 
 
                                     <fieldset>
-                                        <input type="button" name="previous" class="previous btn btn-secondary" value="Previous" />
-                                        <input type="button" name="next" class="next btn btn-primary" id="nextButton" value="Next" disabled />
-                                        <div class="form-card">
+                                        <div class="form-card mb-0">
                                             <div class="card">
                                                 <div class="card-header text-dark">Schedule</div>
                                                 <div class="card-body">
@@ -483,14 +499,12 @@ if (isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] === true) {
                                                 </div>
                                             </div>
                                         </div>
+                                        <input type="button" name="previous" class="previous btn btn-secondary" value="Previous" />
+                                        <input type="button" name="next" class="next btn btn-primary" id="nextButton" value="Next" disabled />
                                     </fieldset>
 
                                     <fieldset>
-                                        <input type="button" name="previous" class="previous btn btn-secondary"
-                                            value="No, Review Information" />
-                                        <input class="btn btn-primary" type="submit" name="submit"
-                                            value="Yes, Reserve Now" />
-                                        <div class="form-card">
+                                        <div class="form-card mb-0">
                                             <div class="card">
                                                 <div class="card-header text-dark">Confirmation</div>
                                                 <div class="card-body text-dark">
@@ -522,6 +536,11 @@ if (isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] === true) {
                                                 </div>
                                             </div>
                                         </div>
+                                        <input type="button" name="previous" class="previous btn btn-secondary"
+                                            value="No, Review Information" />
+                                        <input class="btn btn-primary" type="submit" name="submit"
+                                            value="Yes, Reserve Now" />
+
                                         <script>
                                             // Function to update confirmation details
                                             function updateConfirmationDetails() {

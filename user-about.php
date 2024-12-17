@@ -3,15 +3,33 @@ session_start();
 
 require_once "connectDB.php";
 
+// Check if user is logged in
 if (isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] === true) {
+    // Fetch user details from the database
     $sql = "SELECT * FROM users WHERE user_id = '" . $_SESSION['id'] . "'";
     $result = mysqli_query($link, $sql);
-    $row = mysqli_fetch_assoc($result);
 
-    $active = "about";
+    if ($result && $row = mysqli_fetch_assoc($result)) {
+        $user_id = $row['user_id'];
+
+        // Check if the verified field is 0
+        if ($row['verified'] == 0) {
+            // Redirect to the verify-email page
+            header("location: verify-email.php");
+            exit();
+        }
+
+        $active = "about";
+    } else {
+        // If user data not found in the database, log the user out
+        session_destroy();
+        header("location: login.php");
+        exit();
+    }
 } else {
-    header("location: login");
-    exit;
+    // Redirect to login page if not logged in
+    header("location: login.php");
+    exit();
 }
 
 ?>
