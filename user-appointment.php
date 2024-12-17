@@ -106,7 +106,6 @@ if (isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] === true) {
                             // Building the success message with HTML
                             $successMessage = "
                                 <p style='font-size: 16px;'>
-                                    <strong>Appointment Successful!</strong><br>
                                     Your appointment for <strong>$service</strong>$subserviceText is scheduled on 
                                     <strong>$formattedDate</strong>.
                                 </p>
@@ -123,7 +122,7 @@ if (isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] === true) {
                             // Displaying the SweetAlert success popup with HTML content
                             echo "<script>
                                 swal({
-                                    title: 'Success!',
+                                    title: 'Successfully Booked!',
                                     content: (() => {
                                         const container = document.createElement('div');
                                         container.innerHTML = `$successMessage`;
@@ -493,8 +492,8 @@ if (isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] === true) {
                                             value="Yes, Reserve Now" />
                                         <div class="form-card">
                                             <div class="card">
-                                                <div class="card-header">Confirmation</div>
-                                                <div class="card-body">
+                                                <div class="card-header text-dark">Confirmation</div>
+                                                <div class="card-body text-dark">
                                                     <h3><strong>Confirm Your Information</strong></h3>
                                                     <p>Please review your information for accuracy before proceeding to ensure all details are correct. Are you confident the information provided is accurate?</p>
 

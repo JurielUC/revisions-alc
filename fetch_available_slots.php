@@ -64,7 +64,7 @@ if (isset($_POST['date']) && !empty($_POST['date'])) {
             } else {
                 // If the time is available, show it as clickable
                 $options_html .= '<div class="col-md-4 mb-3">
-                                    <input type="button" class="form-control time-slot" value="' . $formatted_time . '" readonly />
+                                    <input type="button" style="border: 1px solid black" class="form-control time-slot" value="' . $formatted_time . '" readonly />
                                   </div>';
             }
         }
