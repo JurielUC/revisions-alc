@@ -721,7 +721,6 @@ if (isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] === true) {
                 }
 
                 if (mysqli_stmt_execute($stmt)) {
-
                     $sql6 = "UPDATE appointments SET result=? WHERE appointment_id=?";
                     $stmt6 = mysqli_prepare($link, $sql6);
 
@@ -741,6 +740,22 @@ if (isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] === true) {
                                 });
                             };
                             </script>";
+                    }
+
+                    $sql2 = "UPDATE inventory SET quantity_used = quantity_used + 1 WHERE service = ?";
+                    $stmt2 = mysqli_prepare($link, $sql2);
+                    mysqli_stmt_bind_param($stmt2, 's', $service);
+
+                    if (mysqli_stmt_execute($stmt2)) {
+
+                    }
+
+                    $sql99 = "UPDATE inventory SET reserved_item = reserved_item - 1 WHERE service = ? AND reserved_item > 0";
+                    $stmt99 = mysqli_prepare($link, $sql99);
+                    mysqli_stmt_bind_param($stmt99, 's', $service);
+
+                    if (mysqli_stmt_execute($stmt99)) {
+                        
                     }
                 } else {
                     echo "<script>

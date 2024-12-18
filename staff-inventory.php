@@ -37,7 +37,7 @@ if (isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] === true) {
             <?php include "partials/staff-navbar.php"; ?>
 
             <?php
-            $item_err = $quantity_err = $quantity_used_err = "";
+            $item_err = $quantity_err = $reserved_item = $quantity_used_err = "";
             if (isset($_POST["update"])) {
                 $inventory_id = $_POST['inventory_id'];
 
@@ -78,6 +78,8 @@ if (isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] === true) {
                     $quantity = trim($_POST["quantity"]);
                 }
 
+                $reserved_item = trim($_POST["reserved_item"]) ?? '';
+
                 // if (empty(trim($_POST["quantity_used"]))) {
                 //     $quantity_used_err = "Please enter quantity used.";
                 // } else {
@@ -85,9 +87,9 @@ if (isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] === true) {
                 // }
 
                 if (empty($item_err) && empty($quantity_err) && empty($quantity_used_err)) {
-                    $sql1 = "UPDATE inventory SET item=?, quantity=?, quantity_used=? WHERE inventory_id=?";
+                    $sql1 = "UPDATE inventory SET item=?, quantity=?, reserved_item=?, quantity_used=? WHERE inventory_id=?";
                     $stmt = mysqli_prepare($link, $sql1);
-                    mysqli_stmt_bind_param($stmt, 'siii', $item, $quantity, $quantity_used, $inventory_id);
+                    mysqli_stmt_bind_param($stmt, 'siiii', $item, $quantity, $reserved_item, $quantity_used, $inventory_id);
 
                     if (mysqli_stmt_execute($stmt)) {
 
@@ -137,6 +139,7 @@ if (isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] === true) {
                                             <th>Item ID</th>
                                             <th>Item</th>
                                             <th>Quantity</th>
+                                            <th>Reserved Item</th>
                                             <th>Quantity Used</th>
                                             <th>Remaining Stocks</th>
                                             <th>Status</th>
@@ -165,6 +168,7 @@ if (isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] === true) {
                                                     </td>
                                                     <td><?php echo $row1['item']; ?></td>
                                                     <td><?php echo $row1['quantity']; ?></td>
+                                                    <td><?php echo $row1['reserved_item'] ?? 0; ?></td>
                                                     <td><?php echo $row1['quantity_used']; ?></td>
                                                     <td><?php $remaining_stocks = $row1['quantity'] - $row1['quantity_used'];
                                                         echo $remaining_stocks; ?></td>

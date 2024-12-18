@@ -66,7 +66,7 @@ if (isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] === true) {
 
                     if (mysqli_stmt_execute($stmt)) {
                         if ($status == 1) {
-                            $sql2 = "UPDATE inventory SET quantity_used = quantity_used + 1 WHERE service = ?";
+                            $sql2 = "UPDATE inventory SET reserved_item = reserved_item + 1 WHERE service = ?";
                             $stmt2 = mysqli_prepare($link, $sql2);
                             mysqli_stmt_bind_param($stmt2, 's', $service);
 

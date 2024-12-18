@@ -75,6 +75,7 @@ if (isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] === true) {
                                                     <th>Item ID</th>
                                                     <th>Item</th>
                                                     <th>Quantity</th>
+                                                    <th>Reserved Item</th>
                                                     <th>Quantity Used</th>
                                                     <th>Remaining Stocks</th>
                                                     <th>Status</th>
@@ -90,7 +91,7 @@ if (isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] === true) {
                                                     $sql1 .= " WHERE service = '$serviceFilter'";
                                                 }
 
-                                                $sql1 .= " ORDER BY RAND()";
+                                                $sql1 .= " ORDER BY item ASC";
 
                                                 $r = mysqli_query($link, $sql1);
 
@@ -105,6 +106,7 @@ if (isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] === true) {
                                                             <td><?php echo formatID($row1['inventory_id']); ?></td>
                                                             <td><?php echo $row1['item']; ?></td>
                                                             <td><?php echo $row1['quantity']; ?></td>
+                                                            <td><?php echo $row1['reserved_item'] ?? 0; ?></td>
                                                             <td><?php echo $row1['quantity_used']; ?></td>
                                                             <td><?php $remaining_stocks = $row1['quantity'] - $row1['quantity_used'];
                                                                 echo $remaining_stocks; ?></td>

@@ -38,6 +38,11 @@
                                                 <span class="invalid-feedback"><?php echo $quantity_err; ?></span>
                                             </div>
                                             <div class="form-group">
+                                                <label for="example-quantity">Reserved Item</label>
+                                                <input required type="number" class="form-control <?php echo (!empty($reserved_item_err)) ? 'is-invalid' : ''; ?> form-control-lg" name="reserved_item" placeholder="Reserved Item" value="<?php echo $row1['reserved_item']; ?>">
+                                                <span class="invalid-feedback"><?php echo $reserved_item_err; ?></span>
+                                            </div>
+                                            <div class="form-group">
                                                 <label for="example-quantity_used">Quantity Used</label>
                                                 <input required type="number" class="form-control <?php echo (!empty($quantity_used_err)) ? 'is-invalid' : ''; ?> form-control-lg" name="quantity_used" placeholder="Quantity" value="<?php echo $row1['quantity_used']; ?>">
                                                 <span class="invalid-feedback"><?php echo $quantity_used_err; ?></span>

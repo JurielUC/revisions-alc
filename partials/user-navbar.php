@@ -1,11 +1,45 @@
+<?php
+require_once "connectDB.php";
+
+$unread_count = 0;
+
+if (isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] === true) {
+    // if ($_SERVER['REQUEST_URI'] === '/user-home' || $_SERVER['REQUEST_URI'] === '/alc/user-home') {
+    //     $sql_reset_unread = "UPDATE appointments SET unread = 1 WHERE user_id = '" . $_SESSION['id'] . "' AND status IN (1, 2)";
+    //     mysqli_query($link, $sql_reset_unread);
+    // }
+
+    $sql_nav = "SELECT COUNT(*) as unread_count 
+            FROM appointments 
+            WHERE user_id = '" . $_SESSION['id'] . "' 
+            AND unread = 0 
+            AND status IN (1, 2)";
+
+    $result_nav = mysqli_query($link, $sql_nav);
+    if ($result_nav && $row_nav = mysqli_fetch_assoc($result_nav)) {
+        $unread_count = $row_nav['unread_count'];
+    }
+} else {
+    header("location: login");
+    exit;
+}
+?>
+
 <nav class="sidebar sidebar-offcanvas" id="sidebar">
     <ul class="nav">
         <li class="nav-item <?php if ($active == "home") {
                                 echo "active";
                             } ?>">
-            <a class="nav-link" href="user-home">
+            <a class="nav-link home-nav" href="user-home">
                 <i class="menu-icon mdi mdi-home"></i>
-                <span class="menu-title">Home</span>
+                <span class="menu-title d-flex">
+                    Home
+                    <div class="mx-2" style="width: 15px; height: 15px; background-color: red; border-radius: 50%; display: flex; justify-content: center; align-items: center; color: white;">
+                        <span style="font-size: 10px;">
+                            <?php echo $unread_count; ?>
+                        </span>
+                    </div>
+                </span>
             </a>
         </li>
         <li class="nav-item nav-category">Services</li>
@@ -80,3 +114,33 @@
         </div>
     </div>
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const homeNavLink = document.querySelector('.home-nav'); 
+        
+        homeNavLink.addEventListener('click', function (e) {
+            e.preventDefault();
+
+            const xhr = new XMLHttpRequest();
+            xhr.open('GET', './update_unread.php', true);
+
+            xhr.onload = function () {
+                if (xhr.status === 200) {
+                    if (xhr.responseText === 'success') {
+                        window.location.href="user-home"
+                    } else {
+                        alert('Failed to mark appointments as read: ' + xhr.responseText);
+                    }
+                } else {
+                    alert('Request failed with status ' + xhr.status);
+                }
+            };
+            xhr.onerror = function () {
+                console.error('Request failed');
+                alert('Request failed, please try again');
+            };
+            xhr.send();
+        });
+    });
+</script>
