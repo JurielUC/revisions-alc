@@ -69,7 +69,7 @@
                 </div>
                 <!-- Right Image -->
                 <div class="col-md-6 hero-image text-end">
-                    <img src="assets/img/cover.png" alt="Medical Laboratory">
+                    <img src="assets/img/cover.png" style="border: 1px solid #dfeac0; border-radius: 20px;" alt="Medical Laboratory">
                 </div>
             </div>
         </div>
@@ -103,24 +103,95 @@
     <hr>
 
     <section class="mt-5 mb-3" id="service">
-        <div class="container">
-            <div class="row">
-                <!-- Section Title -->
-                <div class="col-lg-12 mb-3">
-                    <h2 class="fw-bold text-uppercase text-center">Services</h2>
-                </div>
-                <!-- Service Unavailable Message -->
-                <div class="col-lg-12 text-center">
-                    <div class="alert alert-warning p-4" role="alert">
-                        <h4 class="fw-semibold mb-3">Services Currently Unavailable</h4>
-                        <p style="font-size: 16px;">
-                            We’re working hard to bring you our services soon. Please check back later or contact us for more information. Thank you for your understanding!
-                        </p>
+    <div class="container">
+        <div class="row">
+            <!-- Section Title -->
+            <div class="col-lg-12 mb-3">
+                <h2 class="fw-bold text-uppercase text-center">Services</h2>
+                <p class="text-center text-muted" style="font-size: 16px;">Explore our comprehensive range of diagnostic services designed to meet your healthcare needs.</p>
+            </div>
+            
+            <!-- Service List -->
+            <div class="col-lg-12">
+                <div class="row">
+                    <!-- Service Card -->
+                    <div class="col-md-4 mb-3">
+                        <div class="card h-100 shadow-sm">
+                            <div class="card-body">
+                                <h5 class="card-title">Chem6</h5>
+                                <p class="card-text">Price: 800</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <div class="card h-100 shadow-sm">
+                            <div class="card-body">
+                                <h5 class="card-title">Chem7</h5>
+                                <p class="card-text">Price: 1100</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <div class="card h-100 shadow-sm">
+                            <div class="card-body">
+                                <h5 class="card-title">Chem8</h5>
+                                <p class="card-text">Price: 1200</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <div class="card h-100 shadow-sm">
+                            <div class="card-body">
+                                <h5 class="card-title">Chem9</h5>
+                                <p class="card-text">Price: 1350</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <div class="card h-100 shadow-sm">
+                            <div class="card-body">
+                                <h5 class="card-title">Chem10</h5>
+                                <p class="card-text">Price: 1500</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <div class="card h-100 shadow-sm">
+                            <div class="card-body">
+                                <h5 class="card-title">Chem13</h5>
+                                <p class="card-text">Price: 2400</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <div class="card h-100 shadow-sm">
+                            <div class="card-body">
+                                <h5 class="card-title">Urinalysis</h5>
+                                <p class="card-text">Price: 100</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <div class="card h-100 shadow-sm">
+                            <div class="card-body">
+                                <h5 class="card-title">Complete Blood Count</h5>
+                                <p class="card-text">Price: 350</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <div class="card h-100 shadow-sm">
+                            <div class="card-body">
+                                <h5 class="card-title">Fecalysis</h5>
+                                <p class="card-text">Price: 80</p>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-    </section>
+    </div>
+</section>
 
     <hr>
 
@@ -130,6 +201,7 @@
                 <!-- Contacts Title -->
                 <div class="col-lg-12 mb-3">
                     <h2 class="fw-bold text-uppercase text-center">Contacts</h2>
+                    <p class="text-center text-muted" style="font-size: 16px;">Have questions or need assistance? Reach out to us through the provided contact details, and we’ll be happy to help you!</p>
                 </div>
             </div>
             
